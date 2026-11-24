@@ -10,7 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class BookService {
 
-	private static final Set<String> SORT_FIELDS = Set.of("id", "title", "author", "isbn");
+	private static final Set<String> SORT_FIELDS = Set.of(
+			"id", "title", "author", "isbn", "publisher", "publicationYear", "genre");
 
 	private final BookRepository repository;
 
@@ -20,7 +21,9 @@ public class BookService {
 
 	@Transactional
 	public BookResponse create(BookRequest request) {
-		Book book = new Book(request.title().trim(), request.author().trim(), request.normalizedIsbn());
+		Book book = new Book(request.title().trim(), request.author().trim(), request.normalizedIsbn(),
+				optionalText(request.description()), optionalText(request.publisher()),
+				request.publicationYear(), optionalText(request.genre()));
 		return BookResponse.from(repository.save(book));
 	}
 
@@ -54,7 +57,9 @@ public class BookService {
 	@Transactional
 	public BookResponse update(Long id, BookRequest request) {
 		Book book = findBook(id);
-		book.update(request.title().trim(), request.author().trim(), request.normalizedIsbn());
+		book.update(request.title().trim(), request.author().trim(), request.normalizedIsbn(),
+				optionalText(request.description()), optionalText(request.publisher()),
+				request.publicationYear(), optionalText(request.genre()));
 		return BookResponse.from(book);
 	}
 
@@ -65,5 +70,12 @@ public class BookService {
 
 	private Book findBook(Long id) {
 		return repository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
+	}
+
+	private static String optionalText(String value) {
+		if (value == null || value.isBlank()) {
+			return null;
+		}
+		return value.trim();
 	}
 }

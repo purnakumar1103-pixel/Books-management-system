@@ -4,12 +4,17 @@ import java.util.Locale;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 public record BookRequest(
 		@NotBlank @Size(max = 255) String title,
 		@NotBlank @Size(max = 255) String author,
-		@NotBlank @Size(max = 32) String isbn) {
+		@NotBlank @Size(max = 32) String isbn,
+		@Size(max = 2000) String description,
+		@Size(max = 255) String publisher,
+		@Positive Integer publicationYear,
+		@Size(max = 100) String genre) {
 
 	public String normalizedIsbn() {
 		return isbn == null ? null : isbn.replaceAll("[\\s-]", "").toUpperCase(Locale.ROOT);

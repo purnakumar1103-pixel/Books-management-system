@@ -19,7 +19,7 @@ Check an item only when the feature is implemented and verified.
 ### Book catalog
 
 - [x] Add a book with its title, author, and ISBN.
-- [ ] Add other useful book metadata, once the fields are chosen.
+- [x] Add optional description, publisher, publication year, and genre to each book.
 - [x] View one book and browse the catalog.
 - [x] Update and delete a book. Rules for deleting books with loan history remain to be decided.
 - [x] Search books by title, author, and ISBN.

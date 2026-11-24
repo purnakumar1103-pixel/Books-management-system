@@ -1,5 +1,6 @@
 package com.books.books_management_system.book;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -115,5 +116,60 @@ class BookControllerTests {
 							{"title":"A Book","author":"Someone","isbn":"---"}
 							"""))
 				.andExpect(status().isBadRequest());
+
+		mvc.perform(post("/api/books")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("""
+							{"title":"A Book","author":"Someone","isbn":"9780134685991","publicationYear":0}
+							"""))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.fields.publicationYear").exists());
+	}
+
+	@Test
+	void storesUpdatesAndClearsOptionalMetadata() throws Exception {
+		String location = mvc.perform(post("/api/books")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("""
+							{"title":"Effective Java","author":"Joshua Bloch","isbn":"9780134685991",
+							 "description":"  Java programming advice  ","publisher":"  Addison-Wesley  ",
+							 "publicationYear":2018,"genre":" Programming "}
+							"""))
+				.andExpect(status().isCreated())
+				.andReturn().getResponse().getHeader("Location");
+
+		mvc.perform(get(location))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.description").value("Java programming advice"))
+				.andExpect(jsonPath("$.publisher").value("Addison-Wesley"))
+				.andExpect(jsonPath("$.publicationYear").value(2018))
+				.andExpect(jsonPath("$.genre").value("Programming"));
+
+		mvc.perform(put(location)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("""
+							{"title":"Effective Java","author":"Joshua Bloch","isbn":"9780134685991",
+							 "description":"Updated description","publisher":"Pearson",
+							 "publicationYear":2019,"genre":"Software"}
+							"""))
+				.andExpect(status().isOk());
+
+		mvc.perform(get(location))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.description").value("Updated description"))
+				.andExpect(jsonPath("$.publisher").value("Pearson"))
+				.andExpect(jsonPath("$.publicationYear").value(2019))
+				.andExpect(jsonPath("$.genre").value("Software"));
+
+		mvc.perform(put(location)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("""
+							{"title":"Effective Java","author":"Joshua Bloch","isbn":"9780134685991"}
+							"""))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.description").value(nullValue()))
+				.andExpect(jsonPath("$.publisher").value(nullValue()))
+				.andExpect(jsonPath("$.publicationYear").value(nullValue()))
+				.andExpect(jsonPath("$.genre").value(nullValue()));
 	}
 }

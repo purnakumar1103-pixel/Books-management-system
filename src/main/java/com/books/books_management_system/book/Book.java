@@ -24,11 +24,26 @@ public class Book {
 	@Column(nullable = false, length = 13)
 	private String isbn;
 
+	@Column(length = 2000)
+	private String description;
+
+	private String publisher;
+
+	private Integer publicationYear;
+
+	@Column(length = 100)
+	private String genre;
+
 	protected Book() {
 	}
 
 	public Book(String title, String author, String isbn) {
-		update(title, author, isbn);
+		this(title, author, isbn, null, null, null, null);
+	}
+
+	public Book(String title, String author, String isbn, String description, String publisher,
+			Integer publicationYear, String genre) {
+		update(title, author, isbn, description, publisher, publicationYear, genre);
 	}
 
 	public Long getId() {
@@ -47,9 +62,30 @@ public class Book {
 		return isbn;
 	}
 
-	public void update(String title, String author, String isbn) {
+	public String getDescription() {
+		return description;
+	}
+
+	public String getPublisher() {
+		return publisher;
+	}
+
+	public Integer getPublicationYear() {
+		return publicationYear;
+	}
+
+	public String getGenre() {
+		return genre;
+	}
+
+	public void update(String title, String author, String isbn, String description, String publisher,
+			Integer publicationYear, String genre) {
 		this.title = title;
 		this.author = author;
 		this.isbn = isbn;
+		this.description = description;
+		this.publisher = publisher;
+		this.publicationYear = publicationYear;
+		this.genre = genre;
 	}
 }

@@ -28,15 +28,15 @@ The tests use an in-memory H2 database, so they do not require MySQL.
 | `PUT` | `/api/books/{id}` | Replace a book's details |
 | `DELETE` | `/api/books/{id}` | Delete a book (`204 No Content`) |
 
-For `POST` and `PUT`, send JSON with `title`, `author`, and `isbn`. ISBN-10 and ISBN-13 values are accepted with or without spaces and hyphens; they must have a valid check digit. Stored ISBNs are normalized to digits, or digits plus `X` for ISBN-10.
+For `POST` and `PUT`, send JSON with required `title`, `author`, and `isbn`. You can also include optional `description` (up to 2,000 characters), `publisher` (up to 255 characters), `publicationYear` (a positive number), and `genre` (up to 100 characters). Omitted or blank optional text fields are stored as `null`. `PUT` replaces the full book, so omitting an existing optional field clears it. ISBN-10 and ISBN-13 values are accepted with or without spaces and hyphens; they must have a valid check digit. Stored ISBNs are normalized to digits, or digits plus `X` for ISBN-10.
 
 ```sh
 curl -i -X POST http://localhost:8080/api/books \
   -H 'Content-Type: application/json' \
-  -d '{"title":"Effective Java","author":"Joshua Bloch","isbn":"978-0-13-468599-1"}'
+  -d '{"title":"Effective Java","author":"Joshua Bloch","isbn":"978-0-13-468599-1","publisher":"Addison-Wesley","publicationYear":2018,"genre":"Programming","description":"Practical Java advice"}'
 ```
 
-Use `q` to search title, author, and ISBN. Results are paginated; the default page is `0` and default size is `20`. The maximum size is `100`. Sort by `id`, `title`, `author`, or `isbn`.
+Use `q` to search title, author, and ISBN. Results are paginated; the default page is `0` and default size is `20`. The maximum size is `100`. Sort by `id`, `title`, `author`, `isbn`, `publisher`, `publicationYear`, or `genre`.
 
 ```sh
 curl 'http://localhost:8080/api/books?q=java&page=0&size=10&sort=title,asc'
